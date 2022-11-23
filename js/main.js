@@ -18,13 +18,33 @@ var gGame = {
 
 const EMPTY = ''
 const MINE = '💣'
+const FLAG = '🚩'
 
 function initGame() {
     gGame.isOn = false
     gBoard = buildBoard()
     renderBoard(gBoard)
-
+    if (gInterval) clearInterval(gInterval)
 }
+
+function beginnerDif() {
+    gLevel.SIZE = 4
+    gLevel.MINES = 2
+    initGame()
+}
+
+function mediumDif() {
+    gLevel.SIZE = 8
+    gLevel.MINES = 14
+    initGame()
+}
+
+function expertDif() {
+    gLevel.SIZE = 12
+    gLevel.MINES = 32
+    initGame()
+}
+
 
 function buildBoard() {
     const board = []
@@ -39,7 +59,7 @@ function buildBoard() {
 }
 
 function renderBoard(board) {
-    var strHTML = '<table><tbody>'
+    var strHTML = '<table oncontextmenu="return false"><tbody>'
 
     for (var i = 0; i < gLevel.SIZE; i++) {
         strHTML += '<tr>'
@@ -52,9 +72,9 @@ function renderBoard(board) {
                 classStr += 'show-cell'
             } else {
                 str = EMPTY
-                classStr += 'hide-cell'
+                classStr += ' hide-cell'
             }
-            strHTML += `<td class="${classStr}" onclick="cellClicked(this, ${i}, ${j})">${str}</td>`
+            strHTML += `<td class="${classStr}"  onclick="cellClicked(this, ${i}, ${j})" oncontextmenu="cellMarked(this)" >${str}</td>`
         }
         strHTML += '</tr>'
     }
@@ -65,12 +85,14 @@ function renderBoard(board) {
 
 function createCell() {
     const cell = {
-        minesAroundCount: 4,
+        minesAroundCount: 0,
         isShown: false,
         isMine: false,
         isMarked: true
     }
+
     return cell
+
 }
 
 function setMinesNegsCount(board) {
@@ -107,26 +129,41 @@ function firstCellClicked(i, j) {
         expandShown(gBoard, i, j)
     }
     gGame.isOn = true
-    gInterval = setInterval(timer,1000)
+    gInterval = setInterval(timer, 1000)
 }
 
 function cellClicked(elCell, i, j) {
-    if (gGame.isOn) {
-        const currCell = gBoard[i][j]
-        if (currCell.isMine) {
-            showMine()
-            return
-        }
-        if (!currCell.minesAroundCount) {
-            expandShown(gBoard, i, j)
-        }
-        gGame.shownCount++
-        currCell.isShown = true
-        var str = minesAroundCountcolor(currCell.minesAroundCount)
-        elCell.innerHTML = str
-        elCell.classList.replace('hide-cell', 'show-cell')
+    if (elCell.innerHTML === FLAG) return
+    if (gGame.shownCount !== 0) {
+        if (!gGame.isOn) return
+            const currCell = gBoard[i][j]
+            if (cell.isShown) return
+            if (currCell.isMine) {
+                showMine()
+                return
+            }
+            if (!currCell.minesAroundCount) {
+                expandShown(gBoard, i, j)
+            }
+            gGame.shownCount++
+            currCell.isShown = true
+            var str = minesAroundCountcolor(currCell.minesAroundCount)
+            elCell.innerHTML = str
+            elCell.classList.replace('hide-cell', 'show-cell')
+            if (checkGameOver()) gameOver()
+        } else firstCellClicked(i, j)
+    }
+
+
+function cellMarked(elCell) {
+    if (elCell.innerHTML === FLAG) {
+        elCell.innerHTML = EMPTY
+        gGame.markedCount--
+    } else {
+        elCell.innerHTML = FLAG
+        gGame.markedCount++
         if (checkGameOver()) gameOver()
-    } else firstCellClicked(i, j)
+    }
 }
 
 function minesAroundCountcolor(minesAroundCount) {
@@ -182,17 +219,20 @@ function expandShown(board, rowIdx, colIdx) {
             if (j < 0 || j >= board[i].length) continue
             if (i === rowIdx && j === colIdx) continue
             const currCell = board[i][j]
+            if (currCell.isShown) continue
             gGame.shownCount++
             currCell.isShown = true
             renderCell({ i, j }, minesAroundCountcolor(currCell.minesAroundCount))
+            if (!currCell.minesAroundCount) { expandShown(board, i, j) }
         }
     }
 }
 
 function checkGameOver() {
-    return gGame.shownCount === gLevel.SIZE ** 2 - gLevel.MINES
+    return gGame.shownCount === gLevel.SIZE ** 2 - gLevel.MINES && gGame.markedCount === gLevel.MINES
 }
 
 function gameOver() {
+    gGame.isOn = false
     clearInterval(gInterval)
 }
