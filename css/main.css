@@ -1,0 +1,28 @@
+body {
+    text-align: center;
+}
+
+table {
+    margin: auto;
+}
+
+td {
+    font-size: large;
+    height: 20px;
+    width: 20px;
+}
+
+.show-cell {
+    background-color: whitesmoke;
+}
+
+.hide-cell {
+    background-color: gray;
+}
+
+button {
+    font-size: large;
+    margin: auto;
+    border-radius: 5px;
+    
+}
