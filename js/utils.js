@@ -142,8 +142,8 @@ function getEmptyCells() {
 // }
 
 function drawCell(cells) {
-    var idx = getRandomInt(0, cells.length)
-    var cell = cells.splice(idx, 1)[0]
+    const idx = getRandomInt(0, cells.length)
+    const cell = cells.splice(idx, 1)[0]
     return cell
 }
 

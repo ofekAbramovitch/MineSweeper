@@ -4,9 +4,13 @@ h1 {
 
 
 body {
+    margin-top: 70px;
     text-align: center;
     color: goldenrod;
-    background-color: black;
+    background-image: url('img/bck.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 table {
@@ -56,5 +60,9 @@ img {
     width: 70px;
     height: 70px;
     background-color: black;
+}
+
+footer {
+    margin-top: 200px;
 }
 

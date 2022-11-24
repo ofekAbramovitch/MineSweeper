@@ -4,12 +4,12 @@ const EMPTY = ''
 const MINE = '💣'
 const FLAG = '🚩'
 const winImg = '<img src="img/happy.jpg"></img>'
-const lossImg = '<img src="img/sad2.jpg"></img>'
+const lossImg = '<img src="img/sad1.png"></img>'
 const neutImg = '<img src="img/neutral.jpg"></img>'
 var gBoard
 var gInterval
-var gUndo = []
 var gLives
+var isFirstClick
 
 var gLevel = {
     SIZE: 4,
@@ -25,14 +25,15 @@ var gGame = {
 
 
 function initGame() {
+    initGameBonus()
     document.querySelector('.neutral').innerHTML = neutImg
-    gLives = 3
     gGame.shownCount = 0
     gGame.markedCount = 0
     gGame.secsPassed = 0
     gBoard = buildBoard()
     if (gInterval) clearInterval(gInterval)
     renderBoard(gBoard)
+    isFirstClick = true
 }
 
 function beginnerDif() {
@@ -142,13 +143,13 @@ function firstCellClicked(i, j) {
 
 function cellClicked(elCell, i, j) {
     if (elCell.innerHTML === FLAG) return
-    if (gGame.shownCount !== 0) {
+    if (isHintLeft) return showHint({ i, j })
+    if (!isFirstClick) {
         if (!gGame.isOn) return
         const currCell = gBoard[i][j]
         if (currCell.isShown) return
         if (currCell.isMine) {
             showMine(elCell)
-            gUndo.push(copyBoard(gBoard))
             return
         }
         if (!currCell.minesAroundCount) {
@@ -166,6 +167,7 @@ function cellClicked(elCell, i, j) {
     } else {
         firstCellClicked(i, j)
         gUndo.push(copyBoard(gBoard))
+        isFirstClick = false
     }
 }
 
@@ -255,25 +257,6 @@ function expandShown(board, rowIdx, colIdx) {
             if (!currCell.minesAroundCount) { expandShown(board, i, j) }
         }
     }
-}
-
-function undo() {
-    if (!gUndo) return
-    var board = gUndo.pop()
-    gBoard = board
-    renderBoard(board)
-}
-
-function copyBoard(board) {
-    const copy = []
-    for (var i = 0; i < gLevel.SIZE; i++) {
-        copy[i] = []
-        for (var j = 0; j < gLevel.SIZE; j++) {
-            const currCell = board[i][j]
-            copy[i][j] = createCell(currCell.minesAroundCount, currCell.isShown, currCell.isMine, currCell.isMarked)
-        }
-    }
-    return copy
 }
 
 function checkGameOver() {
