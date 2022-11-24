@@ -17,10 +17,18 @@
         <button onclick="mediumDif()">Medium</button>
         <button onclick="expertDif()">Expert</button>
     </div>
-    <div class="timer">
-        <h2>Timer: <span>00:00</span></h2>
+    <div>
+        <h2 class="timer">Timer: <span>00:00</span></h2>
     </div>
+    <div>
+        <h2>Lives left: <span class="lives">❤️❤️❤️</span></h2>
+    </div>
+    <div>
+        <h2>Hints left: <span class="hints"><button onclick="hint()">💡💡💡</span></h2>
+    </div>
+    <div class="neutral" onclick="initGame()"><img src="img/neutral.jpg"></div>
     <div class="board"></div>
+    <button class="undo" onclick="undo()">Undo last move</button>
     <script src="js/main.js"></script>
     <script src="js/utils.js"></script>
 </body>
