@@ -17,20 +17,29 @@
         <button onclick="mediumDif()">Medium</button>
         <button onclick="expertDif()">Expert</button>
     </div>
-    <div>
+    <div class="timer-div">
         <h2 class="timer">Timer: <span>00:00</span></h2>
     </div>
-    <div>
+    <div class="lives-div">
         <h2>Lives left: <span class="lives">❤️❤️❤️</span></h2>
     </div>
     <div class="hints-div">
-        <h2 class="hints">Hints left:<span onclick="hint()">💡💡💡</span>
-
-        </h2>
+        <h2 class="hints">Hints left:<span onclick="hint()">💡💡💡</span> </h2>
+    </div>
+    <div class="score-div">
+        <h2 class="score">Best score: <span></span></h2>
     </div>
     <div class="neutral" onclick="initGame()"><img src="img/neutral.jpg"></div>
     <div class="board"></div>
-    <button class="undo" onclick="undo()">Undo last move</button>
+    <div class="safe-click-div">
+        <button class="safe-click" onclick="safeClick()">Safe Click</button>
+        <span>3</span> clicks available
+    </div>
+    <button class="man-create" onclick="manCreate(this)">Manually create mode</button>
+    <div class="undo-div">
+        <button class="undo" onclick="undo()">Undo last move</button>
+    </div>
+
     <script src="js/main.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/bonuses.js"></script>

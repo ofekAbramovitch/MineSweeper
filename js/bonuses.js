@@ -3,17 +3,26 @@
 var hintsCount
 var isHintLeft
 var localStorageLevel
+var safeClickCount
+var isManCreateMode
+var manCreateCount
 var gUndo
 
 
 
 function initGameBonus() {
-    document.querySelector('.lives').innerText = '❤️'.repeat(3)
-    document.querySelector('.hints span').innerText = '💡'.repeat(3)
     gLives = 3
+    document.querySelector('.lives').innerText = '❤️'.repeat(3)
     hintsCount = 3
+    document.querySelector('.hints span').innerText = '💡'.repeat(3)
     isHintLeft = false
     localStorageLevel = gLevel.SIZE
+    updateElScore()
+    safeClickCount = 3
+    document.querySelector('.safe-click-div span').innerText = safeClickCount
+    isManCreateMode = false
+    manCreateCount = 0
+    gLevel.MINES = initMines()
     gUndo = []
 }
 
@@ -52,9 +61,65 @@ function saveLevelScore(localStorageLevel) {
     }
 }
 
+function updateLevelScore(currScore, localStorageLevel) {
+    const prevScore = localStorage.getItem(localStorageLevel)
+    if (currScore < prevScore || prevScore === '-1') {
+        localStorage.setItem(localStorageLevel, currScore)
+    }
+}
 
+function updateElScore() {
+    const score = localStorage.getItem(localStorageLevel)
+    const elScore = document.querySelector('.score span')
+    elScore.innerText = convertTime(score)
+}
 
+function safeClick() {
+    if (!safeClickCount) return
+    const cells = []
+    for (var i = 0; i < gLevel.SIZE; i++) {
+        for (var j = 0; j < gLevel.SIZE; j++) {
+            if (!gBoard[i][j].isShown && !gBoard[i][j].isMine) cells.push({ i, j })
+        }
+    }
+    const currCell = drawCell(cells)
+    const val = minesAroundCountcolor(gBoard[currCell.i][currCell.j].minesAroundCount)
+    renderCell(currCell, val)
+    setTimeout(function () {
+        renderCell(currCell, EMPTY, false)
+    }, 2000)
+    safeClickCount--
+    document.querySelector('.safe-click-div span').innerText = safeClickCount
+}
 
+function initMines() {
+    if (gLevel.SIZE === 4) return 2
+    if (gLevel.SIZE === 8) return 14
+    if (gLevel.SIZE === 12) return 32
+}
+
+function manCreate(elBtn) {
+    if (elBtn.innerText === 'Manually create mode') {
+        initGame()
+        elBtn.innerText = 'Start'
+        isManCreateMode = true
+    } else {
+        elBtn.innerText = 'Manually create mode'
+        setMinesNegsCount(gBoard)
+        renderBoard(gBoard)
+        gLevel.MINES = manCreateCount
+        isManCreateMode = false
+        isFirstClick = false
+        gGame.isOn = true
+        gInterval = setInterval(timer, 1000)
+    }
+}
+
+function initManCreate(location) {
+    renderCell(location, MINE)
+    gBoard[location.i][location.j].isMine = true
+    manCreateCount++
+}
 
 function undo() {
     if (!gUndo.length) return

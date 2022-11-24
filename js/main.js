@@ -40,18 +40,28 @@ function beginnerDif() {
     gLevel.SIZE = 4
     gLevel.MINES = 2
     initGame()
+    localStorageLevel = gLevel.SIZE
+    saveLevelScore(localStorageLevel)
+    updateElScore()
 }
 
 function mediumDif() {
     gLevel.SIZE = 8
     gLevel.MINES = 14
     initGame()
+    localStorageLevel = gLevel.SIZE
+    saveLevelScore(localStorageLevel)
+    updateElScore()
 }
+
 
 function expertDif() {
     gLevel.SIZE = 12
     gLevel.MINES = 32
     initGame()
+    localStorageLevel = gLevel.SIZE
+    saveLevelScore(localStorageLevel)
+    updateElScore()
 }
 
 
@@ -144,6 +154,7 @@ function firstCellClicked(i, j) {
 function cellClicked(elCell, i, j) {
     if (elCell.innerHTML === FLAG) return
     if (isHintLeft) return showHint({ i, j })
+    if (isManCreateMode) return initManCreate({ i, j })
     if (!isFirstClick) {
         if (!gGame.isOn) return
         const currCell = gBoard[i][j]
@@ -266,7 +277,11 @@ function checkGameOver() {
 function gameOver() {
     clearInterval(gInterval)
     var elNeut = document.querySelector('.neutral')
-    if (checkGameOver()) elNeut.innerHTML = winImg
+    if (checkGameOver()) {
+        elNeut.innerHTML = winImg
+        updateLevelScore(gGame.secsPassed - 1, localStorageLevel)
+        updateElScore()
+    }
     else elNeut.innerHTML = lossImg
     gGame.isOn = false
 }
