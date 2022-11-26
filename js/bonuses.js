@@ -87,7 +87,7 @@ function safeClick() {
     renderCell(currCell, val)
     setTimeout(function () {
         renderCell(currCell, EMPTY, false)
-    }, 2000)
+    }, 1500)
     safeClickCount--
     document.querySelector('.safe-click-div span').innerText = safeClickCount
 }
@@ -123,8 +123,10 @@ function initManCreate(location) {
 
 function undo() {
     if (!gUndo.length) return
+    if (!gGame.isOn) return
     var board = gUndo.pop()
     gBoard = board
+    countShownAndMarked()
     renderBoard(board)
 }
 
@@ -138,4 +140,16 @@ function copyBoard(board) {
         }
     }
     return copy
+}
+
+function countShownAndMarked() {
+    gGame.shownCount = 0
+    gGame.markedCount = 0
+    for (var i = 0; i < gLevel.SIZE; i++) {
+        for (var j = 0; j < gLevel.SIZE; j++) {
+            const currCell = gBoard[i][j]
+            if (currCell.isShown) gGame.shownCount++
+            else if (currCell.isMarked) gGame.markedCount++
+        }
+    }
 }

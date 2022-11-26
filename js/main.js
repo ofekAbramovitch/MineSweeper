@@ -84,12 +84,13 @@ function renderBoard(board) {
         for (var j = 0; j < gLevel.SIZE; j++) {
             const currCell = board[i][j]
             var classStr = getClassName({ i, j })
+            var str
             if (currCell.isShown) {
-                if (currCell.isMine) var str = MINE
+                if (currCell.isMine) str = MINE
                 else str = minesAroundCountcolor(+currCell.minesAroundCount)
                 classStr += ' show-cell'
             } else {
-                str = EMPTY
+                str = currCell.isMarked ? FLAG : EMPTY
                 classStr += ' hide-cell'
             }
             strHTML += `<td class="${classStr}"  onclick="cellClicked(this, ${i}, ${j})" oncontextmenu="cellMarked(this)" >${str}</td>`
@@ -101,12 +102,12 @@ function renderBoard(board) {
     el.innerHTML = strHTML
 }
 
-function createCell() {
+function createCell(minesAroundCount = 0, isShown = false, isMine = false, isMarked = false) {
     const cell = {
-        minesAroundCount: 0,
-        isShown: false,
-        isMine: false,
-        isMarked: true
+        minesAroundCount,
+        isShown,
+        isMine,
+        isMarked
     }
 
     return cell
@@ -166,6 +167,7 @@ function cellClicked(elCell, i, j) {
         if (!currCell.minesAroundCount) {
             expandShown(gBoard, i, j)
             gUndo.push(copyBoard(gBoard))
+            if (checkGameOver()) gameOver()
             return
         }
         gGame.shownCount++
@@ -173,7 +175,7 @@ function cellClicked(elCell, i, j) {
         var str = minesAroundCountcolor(currCell.minesAroundCount)
         elCell.innerHTML = str
         elCell.classList.replace('hide-cell', 'show-cell')
-        gUndo.push(gBoard)
+        gUndo.push(copyBoard(gBoard))
         if (checkGameOver()) gameOver()
     } else {
         firstCellClicked(i, j)
@@ -184,14 +186,21 @@ function cellClicked(elCell, i, j) {
 
 
 function cellMarked(elCell) {
+    if (isManCreateMode) return
+    if (elCell.classList.contains('show-cell')) return
+    const loc = getCellLoc(elCell.classList[0])
+    const currCell = gBoard[loc.i][loc.j]
     if (elCell.innerHTML === FLAG) {
+        currCell.isMarked = true
         elCell.innerHTML = EMPTY
         gGame.markedCount--
     } else {
+        currCell.isMarked = true
         elCell.innerHTML = FLAG
         gGame.markedCount++
         if (checkGameOver()) gameOver()
     }
+    gUndo.push(copyBoard(gBoard))
 }
 
 function minesAroundCountcolor(minesAroundCount) {
@@ -250,9 +259,7 @@ function showMine(elCell) {
             if (currCell.isMine) renderCell({ i, j }, MINE)
         }
     }
-    elLives.innerText === ''
     gameOver()
-
 }
 
 function expandShown(board, rowIdx, colIdx) {

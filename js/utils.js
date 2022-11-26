@@ -82,11 +82,12 @@ function getClassName(location) {
 // }
 
 // Convert a location object {i, j} to a selector and render a value in that element
-function renderCell(location, value) {
+function renderCell(location, value, isShow = true) {
     const cellSelector = '.' + getClassName(location) // cell-i-j
     const elCell = document.querySelector(cellSelector)
     elCell.innerHTML = value
-    elCell.classList.replace('hide-cell', 'show-cell')
+    if (isShow) elCell.classList.replace('hide-cell', 'show-cell')
+    else elCell.classList.replace('show-cell', 'hide-cell')
 }
 
 
@@ -145,6 +146,11 @@ function drawCell(cells) {
     const idx = getRandomInt(0, cells.length)
     const cell = cells.splice(idx, 1)[0]
     return cell
+}
+
+function getCellLoc(cellId) {
+    const parts = cellId.split('-')
+    return { i: +parts[1], j: +parts[2] }
 }
 
 
